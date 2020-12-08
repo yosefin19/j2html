@@ -2,6 +2,7 @@ package j2html_codegen;
 
 import j2html_codegen.model.AttrD;
 import org.junit.Test;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.List;
 import static j2html_codegen.generators.AttributeInterfaceCodeGenerator.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 
 public class AttributeInterfaceCodeGeneratorTest{
 
@@ -97,6 +99,33 @@ public class AttributeInterfaceCodeGeneratorTest{
 
        String actual = getInterfaceTemplate("IAccept<T extends Tag>", java.util.Optional.of("IInstance<T>"), imports, "Accept", attr );
        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testWriteAttributeMethod(){
+
+        StringBuilder sb = new StringBuilder("package j2html.tags.attributes;\n" +
+            "import j2html.tags.Tag;\n" +
+            "import j2html.tags.IInstance;\n" +
+            "public interface IOnhashchange<T extends Tag> extends IInstance<T>  {\n");
+
+        String expected = "package j2html.tags.attributes;\n" +
+            "import j2html.tags.Tag;\n" +
+            "import j2html.tags.IInstance;\n" +
+            "public interface IOnhashchange<T extends Tag> extends IInstance<T>  {\n" +
+            "default T withOnhashchange(final String onhashchange_) {" +
+            "get().attr(\"onhashchange\", onhashchange_);\n" +
+            "return get();\n" +
+            "}\n";
+        final String interfaceNameSimple = "Onhashchange";
+        final String attrName = interfaceNameSimple.toLowerCase();
+        final String paramName = attrName+"_";
+        final String[] tags = new String[]{"body"};
+        AttrD attrD = new AttrD("onhashchange",
+            true,
+            tags);
+        writeAttributeMethod(interfaceNameSimple,attrD,sb,attrName,paramName);
+        assertEquals(expected,sb.toString());
     }
 
 }
